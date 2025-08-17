@@ -1,6 +1,46 @@
 # --- Verificador de Força de Senha ---
 # Este script analisa uma senha para verificar se ela atende a critérios de segurança.
+#Estima o tempo que um computador levaria para quebrar a senha por força bruta.
+
 import re
+import math
+
+def estimar_tempo_quebra(senha):
+    tamanho_conjunto = 0
+    if any(c.islower() for c in senha):
+        tamanho_conjunto += 26
+    if any(c.isupper() for c in senha):
+        tamanho_conjunto += 26
+    if any(c.isdigit() for c in senha):
+        tamanho_conjunto += 10
+    if re.search(r'[^a-zA-Z0-9]', senha):
+        tamanho_conjunto += 32
+
+    if tamanho_conjunto == 0:
+        return "Instantaneamente"
+
+    comprimento_senha = len(senha)
+    combinacoes = math.pow(tamanho_conjunto, comprimento_senha)
+
+    tentativas_por_segundo = 10**10
+    segundos_para_quebrar = combinacoes / tentativas_por_segundo
+
+    if segundos_para_quebrar < 1:
+        return "Instantaneamente"
+    elif segundos_para_quebrar < 60:
+        return f"{segundos_para_quebrar:.1f} segundos"
+    elif segundos_para_quebrar < 3600:
+        return f"{segundos_para_quebrar / 60:.1f} minutos"
+    elif segundos_para_quebrar < 86400:
+        return f"{segundos_para_quebrar / 3600:.1f} horas"
+    elif segundos_para_quebrar < 31536000:
+        return f"{segundos_para_quebrar / 86400:.1f} dias"
+    elif segundos_para_quebrar < 3153600000:
+        return f"{segundos_para_quebrar / 31536000:.1f} anos"
+    elif segundos_para_quebrar < 31536000000:
+        return f"{segundos_para_quebrar / 3153600000:.1f} séculos"
+    else:
+        return "Milênios (praticamente inquebrável)"
 
 def analisar_senha(senha):
     print("\n--- Analisando sua senha ---")
@@ -53,5 +93,9 @@ def analisar_senha(senha):
     else:
         print("Resultado: Senha Fraca")
 
+    tempo_estimado = estimar_tempo_quebra(senha)
+    print(f"Tempo estimado para quebra: {tempo_estimado}")
+
 senha_usuario = input("Digite a senha que deseja analisar: ")
 analisar_senha(senha_usuario)
+#madeCaiqueBTC
